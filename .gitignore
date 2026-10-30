@@ -1,0 +1,42 @@
+# Android/Gradle
+.gradle/
+**/build/
+local.properties
+.idea/
+*.iml
+
+# Modelos y artefactos grandes: se descargan aparte
+models/*.gguf
+models/*.bin
+models/*.safetensors
+models/*.pt
+models/*.pth
+
+# Dependencia externa: se clona con docs/REPLICATION.md
+third_party/llama.cpp/
+native/build/
+*.so
+*.apk
+*.idsig
+*.aab
+
+# Datos locales, dispositivos y temporales
+MANU_CONTEXT_CHATGPT.md
+*.db
+*.db-shm
+*.db-wal
+*.log
+*.pid
+captures/
+screenshots/
+training/checkpoints/
+training/outputs/
+training/*.out.log
+training/*.err.log
+training/*.pid
+
+# Sistema/editor
+.DS_Store
+Thumbs.db
+*.swp
+

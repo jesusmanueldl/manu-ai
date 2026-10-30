@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 3.22)
+project(manu_jni)
+add_library(manu_jni SHARED manu_jni.cpp)
+target_include_directories(manu_jni PRIVATE "../third_party/llama.cpp/include" "${ANDROID_NDK}/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include")
+target_link_directories(manu_jni PRIVATE "../third_party/llama.cpp/build-android/bin")
+target_link_libraries(manu_jni llama log android)
+set_target_properties(manu_jni PROPERTIES BUILD_RPATH "$ORIGIN" INSTALL_RPATH "$ORIGIN")
