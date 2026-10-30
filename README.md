@@ -1,5 +1,8 @@
 # MANU — Modelo Autónomo Neural Útil
 
+<img width="1122" height="1402" alt="MANU_infografia_QR_GitHub" src="https://github.com/user-attachments/assets/1179490c-5363-46c6-9c91-901c8052d6f6" />
+
+
 Asistente conversacional local para Android. MANU combina un modelo GGUF
 ejecutado en el dispositivo con herramientas nativas de Android y memoria
 persistentemente local mediante SQLite.
