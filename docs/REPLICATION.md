@@ -36,6 +36,24 @@ third_party/llama.cpp/build-android/bin/
 Se necesitan `libllama.so`, `libllama-common.so`, `libggml.so`,
 `libggml-base.so`, `libggml-cpu.so` y `libc++_shared.so`.
 
+Con PowerShell, la biblioteca JNI de MANU se puede compilar con:
+
+```powershell
+.\scripts\build-native.ps1
+```
+
+El script usa el NDK 26.3.11579264, la arquitectura `arm64-v8a` y rutas
+relativas al repositorio. También puede usarse CMake con la variable
+`LLAMA_ROOT`:
+
+```powershell
+cmake -S native -B "$env:TEMP\manu-native-cmake" -G Ninja `
+  -DCMAKE_TOOLCHAIN_FILE="$env:LOCALAPPDATA\Android\Sdk\ndk\26.3.11579264\build\cmake\android.toolchain.cmake" `
+  -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-26 `
+  -DLLAMA_ROOT="$PWD\third_party\llama.cpp"
+cmake --build "$env:TEMP\manu-native-cmake"
+```
+
 ## 3. Descargar el modelo
 
 Los pesos no forman parte del repositorio. Cada usuario debe descargarlos
@@ -70,8 +88,11 @@ El modelo se copia al teléfono como:
 /data/local/tmp/manu/model.gguf
 ```
 
-MANU lo copia después al almacenamiento privado de la aplicación y lo carga
-mediante JNI. No se necesita root ni desbloquear el bootloader.
+MANU usa primero el archivo que ya existe en su almacenamiento privado
+(`files/manu/model.gguf`). Solo usa `/data/local/tmp/manu/model.gguf` como
+fuente de primera instalación o recuperación. Después de copiarlo, las
+siguientes ejecuciones no dependen de `/data/local/tmp`. No se necesita root
+ni desbloquear el bootloader.
 
 ## 5. Abrir y compilar
 
@@ -96,6 +117,14 @@ El modelo no ejecuta acciones directamente. La aplicación valida la intención,
 ejecuta una herramienta y devuelve el resultado al chat. Las acciones sensibles
 requieren confirmación.
 
+`llama.cpp` mantiene el modelo cargado en una caché nativa durante la vida del
+proceso. Cada consulta crea un contexto de inferencia independiente y libera
+solo ese contexto; los pesos no se vuelven a cargar en cada mensaje.
+
+La API JNI `nativeGenerateStream` informa tokens parciales, latencia del primer
+token, tokens del prompt, tokens generados y tiempo total. La llamada se ejecuta
+en el `ExecutorService` de `LocalModel`, por lo que no bloquea el hilo de UI.
+
 ## Privacidad y límites
 
 - El modelo funciona localmente y no requiere internet.
@@ -113,3 +142,5 @@ requieren confirmación.
   el APK y que `libmanu_jni.so` tenga sus dependencias disponibles.
 - Respuestas lentas: reduce el contexto, usa un modelo cuantizado más pequeño
   o baja el número máximo de tokens.
+- Si se cancela un SMS, MANU elimina el estado de procesamiento y conserva la
+  conversación en SQLite.
